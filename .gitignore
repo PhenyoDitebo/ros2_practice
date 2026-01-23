@@ -1,0 +1,9 @@
+.vscode/
+*.db
+build/
+install/
+log/
+.vscode/
+*.db
+build/
+log/
