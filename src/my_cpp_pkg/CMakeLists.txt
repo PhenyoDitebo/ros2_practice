@@ -24,12 +24,20 @@ ament_target_dependencies(number_counter rclcpp example_interfaces)
 add_executable(simple_lifecycle_node src src/simple_lifecycle_node.cpp)
 ament_target_dependencies(simple_lifecycle_node rclcpp rclcpp_lifecycle std_msgs)
 
+add_executable(simple_qos_publisher src/simple_qos_publisher.cpp)
+ament_target_dependencies(simple_qos_publisher rclcpp std_msgs)
+
+add_executable(simple_qos_subscriber src/simple_qos_subscriber.cpp)
+ament_target_dependencies(simple_qos_subscriber rclcpp std_msgs)
+
 
 install (TARGETS
   test_node
   number_publisher
   number_counter
   simple_lifecycle_node
+  simple_qos_publisher
+  simple_qos_subscriber
   DESTINATION lib/${PROJECT_NAME}/
 )
 
