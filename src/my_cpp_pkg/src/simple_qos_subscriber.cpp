@@ -6,7 +6,7 @@ using std::placeholders::_1; // for binding the callback function
 class SimpleQoSSubscriber : public rclcpp::Node 
 {
     public:
-        SimpleQoSSubscriber() : Node("simple_subscriber"), qos_profile_sub_(10) // constructor 
+        SimpleQoSSubscriber() : Node("simple_qos_subscriber"), qos_profile_sub_(10) // constructor 
         {
             // ------- HUMAN INTERFACE --------
             declare_parameter<std::string>("reliability", "system_default");
