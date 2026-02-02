@@ -1,5 +1,6 @@
 #include "bumperbot_planning/dijkstra_planner.hpp"
 #include "rmw/qos_profiles.h"
+#include "geometry_msgs/msg/transform_stamped.hpp"
 
 namespace bumperbot_planning {
     DijkstraPlanner:: DijkstraPlanner(): Node("dijkstra_node") { // constructor
@@ -32,6 +33,16 @@ namespace bumperbot_planning {
             RCLCPP_ERROR(get_logger(), "No map received!");
             return;
         }
+
+        visited_map_.data = std::vector<int8_t>(visited_map_.info.height * visited_map_.info.width, -1); // clean up. So DJ doesn't look at nodes its already looked at to avoid looping forever -- wipe visited list from last run
+        geometry_msgs::msg::TransformStamped map_to_base_tf;
+        try {
+            map_to_base_tf = tf_buffer_->lookupTransform(map_->header.frame_id, "base_footprint", tf2::TimePointZero); // gives starting point of the DJ search, and maybe footprint of bot relative to that (??)
+        }
+        catch(const tf2::TransformException &ex) { // unable to retreive the starting pos, or current position of the planner
+            RCLCPP_ERROR(get_logger(), "Could not transform frrom map to base_footprint.");
+            return;
+        } 
 
     } 
 
