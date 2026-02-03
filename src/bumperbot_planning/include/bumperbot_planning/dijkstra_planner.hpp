@@ -40,11 +40,6 @@ namespace bumperbot_planning {
             GraphNode res(x + other.first, y + other.second); // creating a new graph node, who's co-ordinates are the addition of the node we were on and the other node we received as input.
             return res; // return result.
         }
-
-
-
-
-
     };
     class DijkstraPlanner : public rclcpp::Node
 {
