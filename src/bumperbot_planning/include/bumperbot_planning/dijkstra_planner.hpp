@@ -33,7 +33,7 @@ namespace bumperbot_planning {
         void mapCallBack(const nav_msgs::msg::OccupancyGrid::SharedPtr map); // will be called when the map topic receives a message -- when it receives the map of the env
         void goalCallBack(const geometry_msgs::msg::PoseStamped::SharedPtr pose); // will be called whenever a message is recieved by the positiion subscriber. (??)
 
-        nav_msgs::msg::Path plan(const geometry_msgs::msg::Pose &start, const geometry_msgs::msg::Pose &goal); //used to plan a path. Will take the starting position and the goal position
+        nav_msgs::msg::Path plan(const geometry_msgs::msg::Pose &start, const geometry_msgs::msg::Pose &goal); //used to plan a path. Will take the starting position and the goal position.
 };
 
 }
