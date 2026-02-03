@@ -9,6 +9,43 @@
 
 
 namespace bumperbot_planning {
+
+    // ----------- SUPPORT CLASS ---------
+    // used to respresent an abstruct nodes in the graph, their co-ordinates and properties
+    struct GraphNode {
+        // Properties
+        int x;
+        int y;
+        int cost; // cost of travel to the next node.
+        std::shared_ptr<GraphNode>prev; // pointer to their parent node.
+
+        // constructor
+        GraphNode (int in_x, int in_y): x(in_x), y(in_y), cost(0) { // x and y co-ordinates and cost
+
+        } 
+
+        // base constructor. Use main one to set co-ordinates of new node made as (0,0)
+        GraphNode() :GraphNode(0,0) {}
+
+
+        // overloading the operators.
+        bool operator>(const GraphNode &other) const { // "other" is the other node we are comparing to.
+            return cost > other.cost;
+        }
+        bool operator==(const GraphNode &other) const {
+            return x == other.x && y == other.y;
+        }
+
+        GraphNode operator+(std::pair<int, int> const &other) {
+            GraphNode res(x + other.first, y + other.second); // creating a new graph node, who's co-ordinates are the addition of the node we were on and the other node we received as input.
+            return res; // return result.
+        }
+
+
+
+
+
+    };
     class DijkstraPlanner : public rclcpp::Node
 {
     public:
