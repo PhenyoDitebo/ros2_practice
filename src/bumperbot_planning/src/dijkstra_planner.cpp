@@ -14,7 +14,7 @@ namespace bumperbot_planning {
         // initialise the ROS2 Interface of Publishers and subscribers
 
         // Subscribers
-        map_sub_ = create_subscription<nav_msgs::msg::OccupancyGrid>("/map", map_qos, std::bind(&DijkstraPlanner::mapCallBack, this, std::placeholders::_1 ));
+        map_sub_ = create_subscription<nav_msgs::msg::OccupancyGrid>("/map", map_qos, std::bind(&DijkstraPlanner::mapCallBack, this, std::placeholders::_1));
         pose_sub_ = create_subscription<geometry_msgs::msg::PoseStamped>("/goal_pose", 10, std::bind(& DijkstraPlanner::goalCallBack, std::placeholders::_1));
 
         //Publishers
@@ -44,10 +44,38 @@ namespace bumperbot_planning {
             return;
         } 
 
+        // ------------- TYPE CONVERSION -------------
+        // Takes the spatial data from the transform object and packs it into the Pose (position) object.
+        // We do this because the transform and position objects use different data structures. (??)
+        geometry_msgs::msg::Pose map_to_base_pose;
+        map_to_base_pose.position.x = map_to_base_tf.transform.translation.x;
+        map_to_base_pose.position.y = map_to_base_tf.transform.translation.y;
+        map_to_base_pose.orientation = map_to_base_tf.transform.rotation;
+
+        auto path = plan(map_to_base_pose, pose->pose);
+
+        if (!path.poses.empty()) {
+            RCLCPP_INFO(get_logger(), "Shortest path found.");
+            path_pub_ -> publish(path);
+        }
+        
+        else {
+            RCLCPP_WARN(get_logger(), "No proper path found, or path is impossible to map out. Either way it's not happening.");
+        }
+
     } 
 
-        // this is the CORE of our planner. It's what will implement the Dijkstra algorithm to calc the plan using the map using start pos and goal pos
-        nav_msgs::msg::Path plan(const geometry_msgs::msg::Pose &start, const geometry_msgs::msg::Pose &goal) {
+        // this is the CORE of our planner. It's what will implement the Dijkstra algorithm to calc the plan using the map using start pos and goal position
+        nav_msgs::msg::Path DijkstraPlanner::plan(const geometry_msgs::msg::Pose &start, const geometry_msgs::msg::Pose &goal) {
 
         }
 }
+
+int main(int argc, char **argv) {
+    rclcpp::init(argc, argv);
+    auto node = std::make_shared<bumperbot_planning::DijkstraPlanner>();
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
+
