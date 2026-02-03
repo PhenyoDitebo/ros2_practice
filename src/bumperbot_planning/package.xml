@@ -7,6 +7,12 @@
   <maintainer email="work.riven100@gmail.com">pdite</maintainer>
   <license>TODO: License declaration</license>
 
+ <depend>rclpy</depend>
+ <depend>rclcpp</depend>
+ <depend>nav_msgs</depend>
+ <depend>geometry_msgs</depend>
+ <depend>tf2_ros</depend>
+
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <test_depend>ament_lint_auto</test_depend>
