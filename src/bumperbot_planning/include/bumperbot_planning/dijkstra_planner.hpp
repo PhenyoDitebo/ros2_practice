@@ -61,9 +61,11 @@ namespace bumperbot_planning {
         std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
         std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
 
-        // ---------- FUNCTIONS ----------
+        // ---------- FUNCTIONS, Declaration ----------
         void mapCallBack(const nav_msgs::msg::OccupancyGrid::SharedPtr map); // will be called when the map topic receives a message -- when it receives the map of the env
         void goalCallBack(const geometry_msgs::msg::PoseStamped::SharedPtr pose); // will be called whenever a message is recieved by the positiion subscriber. (??)
+
+        GraphNode worldtoGrid(const geometry_msgs::msg::Pose &pose); // returns a graph node object whose co-ordinates respond to a position in the occupancy grid.
 
         nav_msgs::msg::Path plan(const geometry_msgs::msg::Pose &start, const geometry_msgs::msg::Pose &goal); //used to plan a path. Will take the starting position and the goal position.
 };
