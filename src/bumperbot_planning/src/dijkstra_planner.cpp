@@ -77,14 +77,46 @@ namespace bumperbot_planning {
             // remember, the dijkstra algo is basically a priority queue that uses weight/costs to see which node to visit next
             std::priority_queue<GraphNode, std::vector<GraphNode>, std::greater<GraphNode>> pending_nodes; // will keep track of the nodes we are yet to visit. Will store in a vector of graph nodes. The greater part is for comparison.
             std::vector<GraphNode> visited_nodes; // used to store the list of the graph nodes that have already been visited by the algo to avoid double visits.  
+
+            // turning the start co-ordinate into a graph node.
+            pending_nodes.push(worldtoGrid(start));
+
+            // going to use this object to recursively keep track of the currently active node which we are exploring.
+            GraphNode active_node;
+
+            while(!pending_nodes.empty() && rclcpp::ok()) {
+                active_node = pending_nodes.top();
+                pending_nodes.pop();
+
+                if (worldtoGrid(goal) == active_node) { // if the goal node is the active_node, we reached the goal.
+                    break;
+                }
+
+                // else if that hasn't happened, explore directions (4, +) 
+                // "have we been here before?"
+                for (const auto &dir : explore_directions) {
+                    GraphNode new_node = active_node + dir; // we are adding the co-ordinates
+                    if (std::find(visited_nodes.begin(), visited_nodes.end(), new_node) == visited_nodes.end()) { // checking if the new nodes had already been visited and in the vector 
+                       // [beginning, end, node we are looking for]. Also, the std::find returns the last node (.end) if the node we looked for hasn't been found.
+                       // need to check if the location of the node is now also in-scope.
+
+                    } 
+                }
+            }
         }
 
         // before starting exploration, we need to make a small conversion.
         // start and end(goal) position are expressed with reference/respect to the map frame.
         // before using the start and end (goal) nodes, we need to convert them to co-ordinates of the grid. Co-ordinates that rep a certain point in the occupancy grid that we are using the planning.
-        GraphNode worldtoGrid(const geometry_msgs::msg::Pose &pose) {
+        GraphNode DijkstraPlanner::worldtoGrid(const geometry_msgs::msg::Pose &pose) { // pose is a reference to the robot's position in the real world (meters??)
 
-        }
+            // create a new graph node whose co-ordinates are corresponding to a certain position in the map.
+            int grid_x = static_cast<int>((pose.position.x - map_->info.origin.position.x)/ map_->info.resolution);
+            int grid_y = static_cast<int>((pose.position.y - map_->info.origin.position.y)/ map_->info.resolution);
+
+            return GraphNode(grid_x, grid_y);
+
+        };
 }
 
 int main(int argc, char **argv) {
