@@ -78,27 +78,27 @@ namespace bumperbot_planning {
             std::priority_queue<GraphNode, std::vector<GraphNode>, std::greater<GraphNode>> pending_nodes; // will keep track of the nodes we are yet to visit. Will store in a vector of graph nodes. The greater part is for comparison.
             std::vector<GraphNode> visited_nodes; // used to store the list of the graph nodes that have already been visited by the algo to avoid double visits.  
 
-            // turning the start co-ordinate into a graph node.
+            // turning the start co-ordinate into a graph node and pushing it into the queue of nodes we need to visit.
             pending_nodes.push(worldtoGrid(start));
 
-            // going to use this object to recursively keep track of the currently active node which we are exploring.
+            // going to use this object to recursively keep track of the currently active node when we are exploring.
             GraphNode active_node;
 
             while(!pending_nodes.empty() && rclcpp::ok()) {
-                active_node = pending_nodes.top();
+                active_node = pending_nodes.top(); // .top() is used for priroity queues over .front(): .top() always points to the node with the lowest weight/cost.
                 pending_nodes.pop();
 
                 if (worldtoGrid(goal) == active_node) { // if the goal node is the active_node, we reached the goal.
                     break;
                 }
-
                 // else if that hasn't happened, explore directions (4, +) 
                 // "have we been here before?"
                 for (const auto &dir : explore_directions) {
                     GraphNode new_node = active_node + dir; // we are adding the co-ordinates
-                    if (std::find(visited_nodes.begin(), visited_nodes.end(), new_node) == visited_nodes.end()) { // checking if the new nodes had already been visited and in the vector 
+                    if (std::find(visited_nodes.begin(), visited_nodes.end(), new_node) == visited_nodes.end() && poseOnMap(new_node) && map_->data.at(poseToCell(new_node)) == 0) { // checking if the new nodes had already been visited and in the vector 
                        // [beginning, end, node we are looking for]. Also, the std::find returns the last node (.end) if the node we looked for hasn't been found.
-                       // need to check if the location of the node is now also in-scope.
+                       // need to check if the location of the node is now also in-scope. We will use a support function.
+                       // when all conditions are met, we can add the new node.
 
                     } 
                 }
@@ -117,6 +117,16 @@ namespace bumperbot_planning {
             return GraphNode(grid_x, grid_y);
 
         };
+
+         bool DijkstraPlanner::poseOnMap (const GraphNode &node) {
+            return node.x >= 0 && node.x < static_cast<int>(map_->info.width) // is the node's x co-ordinate bigger than 0 and smaller than the width of the map?
+                && node.y >= 0 && node.y < static_cast<int>(map_->info.height); // is the node's y co-ordinate bigger than 0 and smaller than the height of the map?
+
+         }
+
+         unsigned int DijkstraPlanner::poseToCell(const GraphNode &node) { // will convert the y and x co-ordinate into a simple index  to access a specific cell of the data vector
+            return node.y * map_->info.width + node.x; // this will get us to the index where the co-ordinate is actually stored.
+         }
 }
 
 int main(int argc, char **argv) {
