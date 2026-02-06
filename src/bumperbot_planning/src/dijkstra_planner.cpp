@@ -98,10 +98,19 @@ namespace bumperbot_planning {
                     if (std::find(visited_nodes.begin(), visited_nodes.end(), new_node) == visited_nodes.end() && poseOnMap(new_node) && map_->data.at(poseToCell(new_node)) == 0) { // checking if the new nodes had already been visited and in the vector 
                        // [beginning, end, node we are looking for]. Also, the std::find returns the last node (.end) if the node we looked for hasn't been found.
                        // need to check if the location of the node is now also in-scope. We will use a support function.
-                       // when all conditions are met, we can add the new node.
+                       // third condition: poseToCell(node), returns index of where to look for the node in the 1D array. 
+                       // when all conditions are met, we can add the new node. map_->data.at(poseToCell(new_node)) takes the data from the map at that position. 
+                       // If the number reads 0, free space, (1-99) probability its not free, -1, unknown.
+
+                       new_node.cost = active_node.cost + 1; // update the cost of travelling from the active node to the new node. For now, lets say its 1. Will act like a BDT algo.
+                       new_node.prev = std::make_shared<GraphNode>(active_node); // new node's parent is our active node.
+                       pending_nodes.push(new_node);
+                       visited_nodes.push_back(new_node);
 
                     } 
                 }
+
+                visited_map_.data.at(poseToCell(active_node)); // this is an occupancy grid
             }
         }
 
@@ -118,13 +127,15 @@ namespace bumperbot_planning {
 
         };
 
+        // is the position on the map? as in, does it exist in the grid, or is itt out of scope? This function will check that.
          bool DijkstraPlanner::poseOnMap (const GraphNode &node) {
             return node.x >= 0 && node.x < static_cast<int>(map_->info.width) // is the node's x co-ordinate bigger than 0 and smaller than the width of the map?
                 && node.y >= 0 && node.y < static_cast<int>(map_->info.height); // is the node's y co-ordinate bigger than 0 and smaller than the height of the map?
 
          }
 
-         unsigned int DijkstraPlanner::poseToCell(const GraphNode &node) { // will convert the y and x co-ordinate into a simple index  to access a specific cell of the data vector
+        // locker number function. Tells computer where to look for the node in the 1D array of the map.
+         unsigned int DijkstraPlanner::poseToCell(const GraphNode &node) { // will convert the y and x co-ordinate into a simple index to access a specific cell of the data vector
             return node.y * map_->info.width + node.x; // this will get us to the index where the co-ordinate is actually stored.
          }
 }
