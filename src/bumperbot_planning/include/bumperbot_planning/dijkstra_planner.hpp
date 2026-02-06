@@ -65,6 +65,8 @@ namespace bumperbot_planning {
         void mapCallBack(const nav_msgs::msg::OccupancyGrid::SharedPtr map); // will be called when the map topic receives a message -- when it receives the map of the env
         void goalCallBack(const geometry_msgs::msg::PoseStamped::SharedPtr pose); // will be called whenever a message is recieved by the positiion subscriber. (??)
 
+        geometry_msgs::msg::Pose gridToWorld(const GraphNode &node);
+
         GraphNode worldtoGrid(const geometry_msgs::msg::Pose &pose); // returns a graph node object whose co-ordinates respond to a position in the occupancy grid.
         bool poseOnMap (const GraphNode &node); // is position on Map? This function will be used to test that.
         unsigned int poseToCell(const GraphNode &node); // converts a 2D co-ordinate (e.g. Row 5, Col 10) into a single array (510)
